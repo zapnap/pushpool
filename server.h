@@ -170,6 +170,8 @@ struct server {
 	char			*db_stmt_sharelog;
 	void			*db_cxn;
 
+  bool      secure_password;
+
 	struct hist		*hist;
 	unsigned char		cur_prevhash[32];
 

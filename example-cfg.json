@@ -79,6 +79,9 @@
 	# length of time to cache username/password credentials, in seconds
 	"auth.cred_cache.expire" : 75,
 
+  # worker passwords stored as SHA1 hashes for security purposes
+  "password.secure": true,
+
 	# RPC settings
 	"rpc.url" : "http://127.0.0.1:8332/",
 	"rpc.user" : "myusername",

@@ -150,6 +150,23 @@ static error_t parse_opt (int key, char *arg, struct argp_state *state)
 	return 0;
 }
 
+static void password_hash(char *pass, char *buf)
+{
+  unsigned char res[256];
+  char tmp[3];
+  int i;
+
+  strcpy(buf, "");
+  SHA1(pass, strlen(pass), res);
+
+  for (i=0; i<20; i++) {
+    sprintf(tmp, "%02x", res[i]);
+    strcat(buf, tmp);
+  }
+
+  strcat(buf, "\0");
+}
+
 static json_t *cjson_decode(void *buf, size_t buflen)
 {
 	json_t *obj = NULL;
@@ -579,6 +596,8 @@ static bool valid_auth_hdr(const char *hdr, char *username_out)
 	size_t hdrlen = strlen(hdr);
 	size_t bin_len = 0;
 	void *bin = NULL;
+  char enc_pass[513];
+  char *enc_pass_ptr = enc_pass;
 
 	t_type = calloc(1, hdrlen + 1);
 	t_b64 = calloc(1, hdrlen + 1);
@@ -610,8 +629,16 @@ static bool valid_auth_hdr(const char *hdr, char *username_out)
 
 	/* password database authentication check */
 	pass_db = pwdb_lookup(user);
-	if (!pass_db || (strcmp(pass, pass_db) && *pass_db != '\0'))
-		goto out;
+  if (!pass_db) {
+    goto out;
+  } else if (!srv.secure_password) {
+    if (strcmp(pass, pass_db) && (*pass_db != '\0'))
+      goto out;
+  } else {
+    password_hash(pass, enc_pass_ptr);
+    if (strcmp(enc_pass_ptr, pass_db) && (*pass_db != '\0'))
+      goto out;
+  }
 
 	rc = true;
 	strncpy(username_out, user, 64);

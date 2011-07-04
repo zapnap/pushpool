@@ -390,6 +390,9 @@ void read_config(void)
 		exit(1);
 	}
 
+  if (json_is_true(json_object_get(jcfg, "password.secure")))
+    srv.secure_password = true;
+
 	if (json_is_true(json_object_get(jcfg, "rpc.target.rewrite")))
 		srv.easy_target = json_string(EASY_TARGET);
 
