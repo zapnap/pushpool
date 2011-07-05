@@ -43,6 +43,9 @@
 #define le32toh OSSwapLittleToHostInt32
 #define htole32 OSSwapHostToLittleInt32
 #define bswap_32 OSSwapInt32
+#define WITHOUT_STRNDUP
+/* util.c */
+extern char *strndup(char const *, size_t);
 #else
 #include <byteswap.h>
 #include <endian.h>
